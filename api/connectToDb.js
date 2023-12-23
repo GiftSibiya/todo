@@ -12,7 +12,9 @@ if (process.env.NODE_ENV != "production") {
 //make it async and add this code from the docs for mongoose. Get your connection string
 async function connectToDb() {
   try {
-    await mongoose.connect();
+    await mongoose.connect(
+      "mongodb+srv://b0b0:BLUcabish@cluster0.lxpgumd.mongodb.net/?retryWrites=true&w=majority"
+    );
     console.log("Connected Successfully");
   } catch (err) {
     console.log(err);

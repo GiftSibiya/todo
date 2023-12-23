@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
 });
 
 // making an note, things get sent via a request
+
 app.post("/tasks", async (req, res) => {
   // get the sent data from the body
   const title = req.body.title;
@@ -43,6 +44,11 @@ app.post("/tasks", async (req, res) => {
 
   //respond with the new task
   res.json({ createNote: createNote });
+});
+
+app.get("/tasks", async (req, res) => {
+  const getTasks = await Task.find();
+  res.json({ getTasks: getTasks });
 });
 
 // Start our server:

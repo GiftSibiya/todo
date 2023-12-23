@@ -8,6 +8,7 @@ if (process.env.NODE_ENV != "production") {
 // Importing dependancies:
 const express = require("express");
 const connectToDb = require("./connectToDb");
+const Task = require("./models/Tasker");
 
 //// Create our express application ////
 //create it
@@ -29,16 +30,21 @@ app.get("/", (req, res) => {
 });
 
 // making an note, things get sent via a request
-app.post("./tasks", (req, res) => {
+app.post("/tasks", async (req, res) => {
   // get the sent data from the body
   const title = req.body.title;
   const bodyText = req.body.bodyText;
 
   //make a task to it
+  const createNote = await Task.create({
+    title: title,
+    bodyText: bodyText,
+  });
 
   //respond with the new task
+  res.json({ createNote: createNote });
 });
 
 // Start our server:
 // The port is in our local enviroment folder
-app.listen(process.env.PORT, () => console.log("listening on 3001"));
+app.listen(3001, () => console.log("listening on 3001"));

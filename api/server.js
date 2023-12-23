@@ -1,19 +1,13 @@
+// Importing dependancies:
 const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const { addListener } = require("nodemon");
 
+// Create our express application
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+// Routing, runs everytime someone hits this directory
+app.get("/", (req, res) => {
+  res.json({ hello: "world" });
+});
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/mern-tasker", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("connected to DB"))
-  .catch(console.error);
-
+// Start our server:
 app.listen(3001, () => console.log("listening on 3001"));

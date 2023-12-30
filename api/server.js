@@ -1,56 +1,61 @@
-// env Variables.
-// we only want this to be in local. not in production.
-
-if (process.env.NODE_ENV != "production") {
-  require("dotenv").config();
-}
-
-// Importing dependancies:
+// Importing Dependencies
+const mongoose = require("mongoose");
 const express = require("express");
-const connectToDb = require("./connectToDb");
-const Task = require("./models/Tasker");
+const cors = require("cors");
+const Schema = mongoose.Schema;
+require("dotenv").config();
 
-//// Create our express application ////
-//create it
 const app = express();
-
-// make it read json
+app.use(cors());
 app.use(express.json());
 
-// //
+// Schema and Model //
+const TaskerSchema = new Schema({
+  title: String,
+  bodyText: String,
+});
 
-//Connect to database
+const Tasker = mongoose.model("tasker", TaskerSchema);
+//--//
+
+/// Connect to database ///
+async function connectToDb() {
+  try {
+    await mongoose.connect(process.env.DB_URL);
+    console.log("Connected to mongo");
+  } catch (err) {
+    console.error(err);
+  }
+}
 connectToDb();
 
-//// Routing, runs everytime someone hits this directory ////
+//--//
 
-// goint into the home page //
-app.get("/", (req, res) => {
-  res.json({ hello: "world" });
+/// Routes ///
+
+app.post("/create", async (req, res) => {
+  //req
+  const newTaskTitle = req.body.title;
+  const newTaskBody = req.body.bodyText;
+  try {
+    const createdTask = await Tasker.create({
+      title: newTaskTitle,
+      bodyText: newTaskBody,
+    });
+    //res
+    res.json(createdTask);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-// making an note, things get sent via a request
-
-app.post("/tasks", async (req, res) => {
-  // get the sent data from the body
-  const title = req.body.title;
-  const bodyText = req.body.bodyText;
-
-  //make a task to it
-  const createNote = await Task.create({
-    title: title,
-    bodyText: bodyText,
-  });
-
-  //respond with the new task
-  res.json({ createNote: createNote });
+app.get("/", async (req, res) => {
+  const allTasks = await Tasker.find();
+  res.json(allTasks);
 });
 
-app.get("/tasks", async (req, res) => {
-  const getTasks = await Task.find();
-  res.json({ getTasks: getTasks });
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`app is listening to port ${PORT}`);
 });
-
-// Start our server:
-// The port is in our local enviroment folder
-app.listen(3001, () => console.log("listening on 3001"));

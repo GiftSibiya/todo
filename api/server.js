@@ -36,8 +36,10 @@ connectToDb();
 
 app.post("/create", async (req, res) => {
   //req
-  const newTaskTitle = req.body.title;
-  const newTaskBody = req.body.bodyText;
+  console.log("Request Body:", req.body);
+  const newTaskTitle = req.body.taskTitle;
+  const newTaskBody = req.body.taskBody;
+  console.log(newTaskTitle);
   try {
     const createdTask = await Tasker.create({
       title: newTaskTitle,

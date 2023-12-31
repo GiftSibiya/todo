@@ -32,6 +32,7 @@ connectToDb();
 //--//
 
 /// Routes ///
+// creating
 
 app.post("/create", async (req, res) => {
   //req
@@ -50,9 +51,30 @@ app.post("/create", async (req, res) => {
   }
 });
 
+// Reading
+
 app.get("/", async (req, res) => {
   const allTasks = await Tasker.find();
   res.json(allTasks);
+});
+
+// Destroying //
+app.delete("/delete/:taskId", async (req, res) => {
+  const taskId = req.params.taskId;
+
+  try {
+    // Find the task by ID and delete it
+    const findAndKill = await Tasker.findByIdAndDelete(taskId);
+
+    if (!findAndKill) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json({ message: "Task deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 const PORT = process.env.PORT;

@@ -1,0 +1,42 @@
+* {
+}
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.app__container {
+  padding: 20px 50px;
+  border-radius: 10px;
+  border: 2px solid blue;
+}
+.note__container {
+  width: 200px;
+  padding: 10px;
+  margin: 10px;
+  height: 200px;
+  border-radius: 20px;
+  border: 2px solid red;
+}
+.note__title {
+  text-align: center;
+  background-color: grey;
+  border-radius: 10px;
+  padding: 10px;
+}
+.note__body {
+  padding: 10px;
+  text-align: center;
+  height: 70px;
+  border-radius: 20px;
+  background-color: orange;
+}
+.btn__delete {
+  cursor: pointer;
+  border: none;
+  padding: 5px;
+  width: 70px;
+  border-radius: 20px;
+  background-color: rgb(164, 60, 60);
+}

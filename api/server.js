@@ -36,8 +36,10 @@ connectToDb();
 
 app.post("/create", async (req, res) => {
   //req
-  const newTaskTitle = req.body.title;
-  const newTaskBody = req.body.bodyText;
+  console.log("Request Body:", req.body);
+  const newTaskTitle = req.body.taskTitle;
+  const newTaskBody = req.body.taskBody;
+  console.log(newTaskTitle);
   try {
     const createdTask = await Tasker.create({
       title: newTaskTitle,
@@ -71,6 +73,31 @@ app.delete("/delete/:taskId", async (req, res) => {
     }
 
     res.json({ message: "Task deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Updating
+app.put("/update/:taskId", async (req, res) => {
+  const taskId = req.params.taskId;
+  const updatedTaskTitle = req.body.taskTitle;
+  const updatedTaskBody = req.body.taskBody;
+
+  try {
+    // Find the task by ID and update its properties
+    const updatedTask = await Tasker.findByIdAndUpdate(
+      taskId,
+      { title: updatedTaskTitle, bodyText: updatedTaskBody },
+      { new: true }
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json(updatedTask);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

@@ -11,6 +11,8 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskBody, setTaskBody] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [editTaskId, setEditTaskId] = useState(null);
 
   // Get data //
   const fetchData = async () => {
@@ -64,14 +66,65 @@ function App() {
   /// Delete Note ///
   const handleDelete = async (taskId) => {
     try {
-      // Make a DELETE request to your backend endpoint to delete the task
       await axios.delete(`http://localhost:4000/delete/${taskId}`);
-      // After successful deletion, fetch updated data
+
       fetchData();
     } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
+  //--//
+
+  /// Edit Notes //
+  let handleEdit = (taskId) => {
+    setEditMode(true);
+    setEditTaskId(taskId);
+
+    // Fetch the existing note data and set it in the input fields
+    const existingTask = tasks.find((task) => task._id === taskId);
+    setTaskTitle(existingTask.title);
+    setTaskBody(existingTask.bodyText);
+  };
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const result = await fetch(`http://localhost:4000/update/${editTaskId}`, {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          taskTitle,
+          taskBody,
+        }),
+      });
+
+      if (result.ok) {
+        const updatedTask = await result.json();
+        console.log("Data has been updated in mongo", updatedTask);
+        alert("Note has been updated");
+
+        // Reset form and exit edit mode
+        setEditMode(false);
+        setEditTaskId(null);
+        setTaskTitle("");
+        setTaskBody("");
+
+        // Fetch updated data without reloading the page
+        fetchData();
+      } else {
+        console.error("Error updating the note");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const editCancel = () => {
+    setEditMode(false);
+  };
+
   //--//
 
   return (
@@ -102,16 +155,51 @@ function App() {
           </form>
         </section>
 
+        <form className="inputs" onSubmit={editMode ? handleUpdate : handleAdd}>
+          {/* ... */}
+        </form>
+
         {tasks.map((task) => (
           <div key={task._id} className="note__container">
-            <p className="note__title">{task.title} </p>
-            <p className="note__body">{task.bodyText}</p>
-            <button
-              className="btn__delete"
-              onClick={() => handleDelete(task._id)}
-            >
-              Delete
-            </button>
+            {editMode ? (
+              <input value={task.title}></input>
+            ) : (
+              <p className="note__title">{task.title}</p>
+            )}
+            {editMode ? (
+              <input value={task.bodyText}></input>
+            ) : (
+              <p className="note__body">{task.bodyText}</p>
+            )}
+
+            {editMode ? (
+              <button className="btn__edit" onClick={editCancel}>
+                Cancel
+              </button>
+            ) : (
+              <button
+                className="btn__edit"
+                onClick={() => handleEdit(task._id)}
+              >
+                Edit
+              </button>
+            )}
+            {editMode ? (
+              <button
+                type="submit"
+                className="btn__delete"
+                onClick={handleUpdate}
+              >
+                Update Note
+              </button>
+            ) : (
+              <button
+                className="btn__delete"
+                onClick={() => handleDelete(task._id)}
+              >
+                Delete
+              </button>
+            )}
           </div>
         ))}
       </body>

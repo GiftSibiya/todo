@@ -79,6 +79,31 @@ app.delete("/delete/:taskId", async (req, res) => {
   }
 });
 
+// Updating
+app.put("/update/:taskId", async (req, res) => {
+  const taskId = req.params.taskId;
+  const updatedTaskTitle = req.body.taskTitle;
+  const updatedTaskBody = req.body.taskBody;
+
+  try {
+    // Find the task by ID and update its properties
+    const updatedTask = await Tasker.findByIdAndUpdate(
+      taskId,
+      { title: updatedTaskTitle, bodyText: updatedTaskBody },
+      { new: true }
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    res.json(updatedTask);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`app is listening to port ${PORT}`);
